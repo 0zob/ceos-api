@@ -11,6 +11,13 @@ class AssetBase(BaseModel):
     parent_asset_id: int | None = None
     folder: bool = False
 
+    @field_validator("parent_asset_id")
+    @classmethod
+    def parent_asset_id_must_be_bigger_than_zero(cls, v: int):
+        if v <= 0:
+            raise ValueError("Parent asset id must be bigger than zero")
+        return v
+
 
 class AssetCreate(AssetBase):
     pass
