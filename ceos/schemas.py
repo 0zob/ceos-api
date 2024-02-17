@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import ForwardRef
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 Asset = ForwardRef("Asset")
 
@@ -13,6 +13,10 @@ class AssetBase(BaseModel):
 
 
 class AssetCreate(AssetBase):
+    pass
+
+
+class AssetUpdate(AssetBase):
     pass
 
 
