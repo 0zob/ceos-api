@@ -28,6 +28,13 @@ def read_asset(asset_id: int, db: Session = Depends(get_db)):
 
 @app.post("/assets/", response_model=schemas.Asset)
 def create_asset(asset: schemas.AssetCreate, db: Session = Depends(get_db)):
+    if asset.parent_asset_id:
+        parent_asset = crud.get_asset(asset.parent_asset_id, db)
+        if not parent_asset or not parent_asset.folder:
+            raise HTTPException(
+                status_code=400,
+                detail="parent_asset_id target is not a folder or not exist",
+            )
     return crud.create_asset(db, asset)
 
 
@@ -40,4 +47,11 @@ def update_asset(
         raise HTTPException(
             status_code=404, detail="The asset with this id does not exist"
         )
+    if asset.parent_asset_id:
+        parent_asset = crud.get_asset(asset.parent_asset_id, db)
+        if not parent_asset or not parent_asset.folder:
+            raise HTTPException(
+                status_code=400,
+                detail="parent_asset_id target is not a folder or not exist",
+            )
     return crud.update_asset(db, stored_asset, asset)
