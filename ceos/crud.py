@@ -31,3 +31,12 @@ def create_asset(db: Session, asset: schemas.AssetCreate):
     db.commit()
     db.refresh(db_asset)
     return db_asset
+
+
+def delete_asset(asset_id: int, db: Session):
+    asset = db.query(models.Asset).get(asset_id)
+    db.delete(asset)
+    db.commit()
+    return asset
+
+
