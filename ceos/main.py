@@ -64,3 +64,7 @@ def update_asset(
                 detail="parent_asset_id target is not a folder or not exist",
             )
     return crud.update_asset(db, stored_asset, asset)
+
+@app.delete("/assets/{asset_id}", response_model=schemas.Asset)
+def delete_asset(asset_id: int, db: Session = Depends(get_db)):
+    return crud.delete_asset(asset_id, db)
