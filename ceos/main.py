@@ -8,7 +8,7 @@ from .database import SessionLocal
 
 app = FastAPI()
 
-#TODO: create a allow origins config
+# TODO: create a allow origins config
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,6 +16,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 def get_db():
     db = SessionLocal()
@@ -32,7 +33,10 @@ def read_assets(db: Session = Depends(get_db)):
 
 @app.get("/assets/{asset_id}", response_model=schemas.Asset)
 def read_asset(asset_id: int, db: Session = Depends(get_db)):
-    return crud.get_asset(asset_id, db)
+    asset = crud.get_asset(asset_id, db)
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    return asset
 
 
 @app.post("/assets/", response_model=schemas.Asset)
@@ -64,6 +68,7 @@ def update_asset(
                 detail="parent_asset_id target is not a folder or not exist",
             )
     return crud.update_asset(db, stored_asset, asset)
+
 
 @app.delete("/assets/{asset_id}", response_model=schemas.Asset)
 def delete_asset(asset_id: int, db: Session = Depends(get_db)):
