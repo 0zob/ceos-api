@@ -72,4 +72,7 @@ def update_asset(
 
 @app.delete("/assets/{asset_id}", response_model=schemas.Asset)
 def delete_asset(asset_id: int, db: Session = Depends(get_db)):
+    asset = crud.get_asset(asset_id, db)
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
     return crud.delete_asset(asset_id, db)
