@@ -10,12 +10,28 @@ class AssetBase(BaseModel):
     name: str
     parent_asset_id: int | None = None
     folder: bool = False
+    file_path: str | None = None
 
     @field_validator("parent_asset_id")
     @classmethod
     def parent_asset_id_must_be_bigger_than_zero(cls, v: int):
         if v is not None and v <= 0:
             raise ValueError("Parent asset id must be bigger than zero")
+        return v
+
+    @field_validator("file_path")
+    @classmethod
+    def file_path_cant_be_empty(cls, v: str):
+        if v == "":
+            raise ValueError("file_path cant be empty")
+        return v
+
+    @field_validator("file_path")
+    @classmethod
+    def folder_asset_dont_have_file_path(cls, v: str, values):
+        folder = values.data.get("folder")
+        if folder and v is not None:
+            raise ValueError("Folders dont have file path")
         return v
 
 
