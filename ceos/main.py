@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from ceos import crud, schemas
+from ceos.deps import check_if_file_exists
 
 from .database import SessionLocal
 
@@ -40,7 +41,13 @@ def read_asset(asset_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/assets/", response_model=schemas.Asset)
-def create_asset(asset: schemas.AssetCreate, db: Session = Depends(get_db)):
+def create_asset(
+    asset: schemas.AssetCreate,
+    db: Session = Depends(get_db),
+    file_exists: bool = Depends(check_if_file_exists),
+):
+    if not file_exists:
+        raise HTTPException(status_code=404, detail="File in file_path not found")
     if asset.parent_asset_id:
         parent_asset = crud.get_asset(asset.parent_asset_id, db)
         if not parent_asset or not parent_asset.folder:
