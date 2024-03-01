@@ -46,7 +46,7 @@ def create_asset(
     db: Session = Depends(get_db),
     file_exists: bool = Depends(check_if_file_exists),
 ):
-    if not file_exists:
+    if not file_exists and not asset.folder:
         raise HTTPException(status_code=404, detail="File in file_path not found")
     if asset.parent_asset_id:
         parent_asset = crud.get_asset(asset.parent_asset_id, db)
