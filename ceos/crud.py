@@ -24,9 +24,7 @@ def update_asset(
 
 
 def create_asset(db: Session, asset: schemas.AssetCreate):
-    db_asset = models.Asset(
-        name=asset.name, folder=asset.folder, parent_asset_id=asset.parent_asset_id
-    )
+    db_asset = models.Asset(**asset.model_dump())
     db.add(db_asset)
     db.commit()
     db.refresh(db_asset)
@@ -38,5 +36,3 @@ def delete_asset(asset_id: int, db: Session):
     db.delete(asset)
     db.commit()
     return asset
-
-
