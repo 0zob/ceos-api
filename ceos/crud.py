@@ -16,7 +16,7 @@ def update_asset(
     db: Session, stored_asset: models.Asset, new_asset_content: schemas.AssetUpdate
 ):
     db.query(models.Asset).filter(models.Asset.id == stored_asset.id).update(
-        new_asset_content.model_dump()
+        new_asset_content.model_dump(exclude_none=True)
     )
     db.commit()
     db.refresh(stored_asset)
