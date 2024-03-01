@@ -21,16 +21,17 @@ class AssetBase(BaseModel):
 
     @field_validator("file_path")
     @classmethod
-    def file_path_cant_be_empty(cls, v: str):
-        if v == "":
-            raise ValueError("file_path cant be empty")
+    def file_path_cant_be_empty_for_files(cls, v: str, values):
+        folder = values.data.get("folder")
+        if v == "" and folder == False:
+            raise ValueError("file_path cant be empty for files")
         return v
 
     @field_validator("file_path")
     @classmethod
     def folder_asset_dont_have_file_path(cls, v: str, values):
         folder = values.data.get("folder")
-        if folder and v is not None:
+        if folder and v:
             raise ValueError("Folders dont have file path")
         return v
 
