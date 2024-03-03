@@ -47,13 +47,7 @@ def create_asset(
     user_service: UserService = Depends(UserService),
 ):
     user_service.validate_create(asset)
-    if asset.parent_asset_id:
-        parent_asset = crud.get_asset(asset.parent_asset_id, db)
-        if not parent_asset or not parent_asset.folder:
-            raise HTTPException(
-                status_code=400,
-                detail="parent_asset_id target is not a folder or not exist",
-            )
+    user_service.validate_parent_asset(asset.parent_asset_id, crud, db)
     return crud.create_asset(db, asset)
 
 
@@ -70,13 +64,7 @@ def update_asset(
         raise HTTPException(
             status_code=404, detail="The asset with this id does not exist"
         )
-    if asset.parent_asset_id:
-        parent_asset = crud.get_asset(asset.parent_asset_id, db)
-        if not parent_asset or not parent_asset.folder:
-            raise HTTPException(
-                status_code=400,
-                detail="parent_asset_id target is not a folder or not exist",
-            )
+    user_service.validate_parent_asset(asset.parent_asset_id, crud, db)
     return crud.update_asset(db, stored_asset, asset)
 
 
@@ -93,13 +81,7 @@ def partial_update_asset(
             status_code=404, detail="The asset with this id does not exist"
         )
 
-    if asset.parent_asset_id:
-        parent_asset = crud.get_asset(asset.parent_asset_id, db)
-        if not parent_asset or not parent_asset.folder:
-            raise HTTPException(
-                status_code=400,
-                detail="parent_asset_id target is not a folder or not exist",
-            )
+    user_service.validate_parent_asset(asset.parent_asset_id, crud, db)
     return crud.update_asset(db, stored_asset, asset)
 
 
