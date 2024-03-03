@@ -27,3 +27,14 @@ class UserService:
             raise HTTPException(detail="Folder cant have file_path", status_code=400)
         if not asset.folder and not self._file_service.check_if_file_exists(asset.file_path):
             raise HTTPException(detail="file_path target not found", status_code=404)
+
+    def validate_parent_asset(self, parent_asset_id: int | None, crud, db):
+        if parent_asset_id:
+            parent_asset = crud.get_asset(parent_asset_id, db)
+            if not parent_asset or not parent_asset.folder:
+                raise HTTPException(
+                    status_code=400,
+                    detail="parent_asset_id target is not a folder or not exist",
+                )
+
+
