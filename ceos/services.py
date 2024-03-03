@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from ceos.config import config
 import os
 
@@ -11,18 +11,19 @@ class FileService:
             return False
         complete_path = os.path.join(config.root_path, file_path)
         return os.path.isfile(complete_path)
+
 class UserService:
-    def __init__(self, check_if_file_exists) -> None:
-        self._file_exists = check_if_file_exists
+    def __init__(self, file_service: FileService = Depends(FileService)) -> None:
+        self._file_service = file_service
 
     def validate_create(self, asset: AssetCreate):
         if asset.folder and asset.file_path is not None:
-            raise HTTPException(detail="Folder cant have file_path", status_code=400)
-        if not asset.folder and not self._file_exists(asset.file_path):
+            raise HTTPException(detail="folder cant have file_path", status_code=400)
+        if not asset.folder and not self._file_service.check_if_file_exists(asset.file_path):
             raise HTTPException(detail="file_path target not found", status_code=404)
 
     def validate_update(self, asset: AssetUpdate):
         if asset.folder and asset.file_path is not None:
             raise HTTPException(detail="Folder cant have file_path", status_code=400)
-        if not asset.folder and not self._file_exists(asset.file_path):
+        if not asset.folder and not self._file_service.check_if_file_exists(asset.file_path):
             raise HTTPException(detail="file_path target not found", status_code=404)
