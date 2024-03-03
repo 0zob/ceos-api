@@ -76,6 +76,26 @@ def update_asset(
     return crud.update_asset(db, stored_asset, asset)
 
 
+@app.patch("/assets/{asset_id}", response_model=schemas.Asset)
+def partial_update_asset(
+    asset: schemas.AssetPatch, asset_id: int, db: Session = Depends(get_db)
+):
+    stored_asset = crud.get_asset(asset_id, db)
+    if not stored_asset:
+        raise HTTPException(
+            status_code=404, detail="The asset with this id does not exist"
+        )
+
+    if asset.parent_asset_id:
+        parent_asset = crud.get_asset(asset.parent_asset_id, db)
+        if not parent_asset or not parent_asset.folder:
+            raise HTTPException(
+                status_code=400,
+                detail="parent_asset_id target is not a folder or not exist",
+            )
+    return crud.update_asset(db, stored_asset, asset)
+
+
 @app.delete("/assets/{asset_id}", response_model=schemas.Asset)
 def delete_asset(asset_id: int, db: Session = Depends(get_db)):
     asset = crud.get_asset(asset_id, db)
