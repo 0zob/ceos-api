@@ -28,6 +28,18 @@ class AssetUpdate(AssetBase):
     pass
 
 
+class AssetPatch(AssetBase):
+    name: str | None = None
+    parent_asset_id: int | None = None
+
+    @field_validator("parent_asset_id")
+    @classmethod
+    def parent_asset_id_must_be_bigger_than_zero(cls, v: int):
+        if v is not None and v <= 0:
+            raise ValueError("Parent asset id must be bigger than zero")
+        return v
+
+
 class Asset(AssetBase):
     id: int
     child_assets: list[Asset] = []
