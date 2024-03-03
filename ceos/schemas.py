@@ -28,7 +28,7 @@ class AssetUpdate(AssetBase):
     pass
 
 
-class AssetPatch(AssetBase):
+class AssetPatch(BaseModel):
     name: str | None = None
     parent_asset_id: int | None = None
 
