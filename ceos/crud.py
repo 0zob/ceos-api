@@ -13,10 +13,13 @@ def get_asset(asset_id: int, db: Session):
 
 
 def update_asset(
-    db: Session, stored_asset: models.Asset, new_asset_content: schemas.AssetUpdate | schemas.AssetPatch
+    db: Session,
+    stored_asset: models.Asset,
+    new_asset_content: schemas.AssetUpdate | schemas.AssetPatch,
+    partial: bool = False,
 ):
     db.query(models.Asset).filter(models.Asset.id == stored_asset.id).update(
-        new_asset_content.model_dump(exclude_none=True)
+        new_asset_content.model_dump(exclude_none=partial)
     )
     db.commit()
     db.refresh(stored_asset)
