@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from ceos import crud, schemas
-from ceos.deps import user_service
+from ceos.services import UserService
 
 from .database import SessionLocal
 
@@ -44,6 +44,7 @@ def read_asset(asset_id: int, db: Session = Depends(get_db)):
 def create_asset(
     asset: schemas.AssetCreate,
     db: Session = Depends(get_db),
+    user_service: UserService = Depends(UserService),
 ):
     user_service.validate_create(asset)
     if asset.parent_asset_id:
@@ -58,7 +59,10 @@ def create_asset(
 
 @app.put("/assets/{asset_id}", response_model=schemas.Asset)
 def update_asset(
-    asset: schemas.AssetUpdate, asset_id: int, db: Session = Depends(get_db)
+    asset: schemas.AssetUpdate,
+    asset_id: int,
+    db: Session = Depends(get_db),
+    user_service: UserService = Depends(UserService),
 ):
     user_service.validate_update(asset)
     stored_asset = crud.get_asset(asset_id, db)
@@ -78,7 +82,10 @@ def update_asset(
 
 @app.patch("/assets/{asset_id}", response_model=schemas.Asset)
 def partial_update_asset(
-    asset: schemas.AssetPatch, asset_id: int, db: Session = Depends(get_db)
+    asset: schemas.AssetPatch,
+    asset_id: int,
+    db: Session = Depends(get_db),
+    user_service: UserService = Depends(UserService),
 ):
     stored_asset = crud.get_asset(asset_id, db)
     if not stored_asset:
