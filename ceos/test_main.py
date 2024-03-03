@@ -1,5 +1,5 @@
-from pytest import fixture
 from fastapi.testclient import TestClient
+from pytest import fixture
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -146,6 +146,69 @@ def test_patch_return_200_if_parent_id_is_folder():
     )
 
     assert response.status_code == 200
+
+
+def test_put_return_400_if_parent_id_is_equal_to_asset_id():
+    asset_for_update = create_asset(name="teste asset", folder=True)
+
+    response = client.put(
+        f"/assets/{asset_for_update.id}",
+        json={"name": "teste", "folder": True, "parent_asset_id": asset_for_update.id},
+    )
+
+    assert response.status_code == 400
+    data = response.json()
+
+    assert data["detail"] == "parent_asset_id cannot be the same as asset id"
+
+
+def test_patch_return_400_if_parent_id_is_equal_to_asset_id():
+    asset_for_update = create_asset(name="teste asset", folder=True)
+
+    response = client.patch(
+        f"/assets/{asset_for_update.id}",
+        json={"name": "teste", "parent_asset_id": asset_for_update.id},
+    )
+
+    assert response.status_code == 400
+    data = response.json()
+
+    assert data["detail"] == "parent_asset_id cannot be the same as asset id"
+
+
+def test_put_return_400_if_parent_asset_doesnt_exists():
+    asset_for_update = create_asset(name="teste asset", folder=True)
+
+    response = client.put(
+        f"/assets/{asset_for_update.id}",
+        json={
+            "name": "teste",
+            "folder": True,
+            "parent_asset_id": asset_for_update.id + 1,
+        },
+    )
+
+    assert response.status_code == 400
+    data = response.json()
+
+    assert data["detail"] == "parent_asset_id target is not a folder or not exist"
+
+
+def test_patch_return_400_if_parent_asset_doesnt_exists():
+    asset_for_update = create_asset(name="teste asset", folder=True)
+
+    response = client.patch(
+        f"/assets/{asset_for_update.id}",
+        json={
+            "name": "teste",
+            "parent_asset_id": asset_for_update.id + 1,
+        },
+    )
+
+    assert response.status_code == 400
+    data = response.json()
+
+    assert data["detail"] == "parent_asset_id target is not a folder or not exist"
 
 
 def test_post_folder_dont_have_file_path():
