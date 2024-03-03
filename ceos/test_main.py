@@ -1,3 +1,4 @@
+from pytest import fixture
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -52,6 +53,7 @@ def create_asset(**obj):
     return asset_created
 
 
+@fixture(autouse=True)
 def clear_database():
     with contextlib.closing(engine.connect()) as con:
         trans = con.begin()
@@ -61,8 +63,6 @@ def clear_database():
 
 
 def test_get_assets():
-    clear_database()
-
     response = client.get("/assets")
 
     assert len(response.json()) == 0
@@ -74,8 +74,6 @@ def test_get_assets():
 
 
 def test_post_return_400_if_parent_id_isnt_folder():
-    clear_database()
-
     asset_created = create_asset(name="teste asset", folder=False)
 
     response = client.post(
@@ -99,8 +97,6 @@ def test_post_return_200_if_parent_if_is_folder():
 
 
 def test_put_return_400_if_parent_id_isnt_folder():
-    clear_database()
-
     asset_created = create_asset(name="teste asset", folder=False)
     asset_for_update = create_asset(name="teste asset", folder=False)
 
@@ -115,8 +111,6 @@ def test_put_return_400_if_parent_id_isnt_folder():
 
 
 def test_put_return_200_if_parent_id_is_folder():
-    clear_database()
-
     asset_created = create_asset(name="teste asset", folder=True)
     asset_for_update = create_asset(name="teste asset", folder=True)
 
@@ -129,8 +123,6 @@ def test_put_return_200_if_parent_id_is_folder():
 
 
 def test_patch_return_400_if_parent_id_isnt_folder():
-    clear_database()
-
     asset_created = create_asset(name="teste asset", folder=False)
     asset_for_update = create_asset(name="teste asset", folder=False)
 
@@ -145,8 +137,6 @@ def test_patch_return_400_if_parent_id_isnt_folder():
 
 
 def test_patch_return_200_if_parent_id_is_folder():
-    clear_database()
-
     asset_created = create_asset(name="teste asset", folder=True)
     asset_for_update = create_asset(name="teste asset", folder=True)
 
