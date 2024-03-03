@@ -47,7 +47,7 @@ def create_asset(
     user_service: UserService = Depends(UserService),
 ):
     user_service.validate_create(asset)
-    user_service.validate_parent_asset(asset.parent_asset_id, crud, db)
+    user_service.validate_parent_asset(asset, crud, db)
     return crud.create_asset(db, asset)
 
 
@@ -59,12 +59,7 @@ def update_asset(
     user_service: UserService = Depends(UserService),
 ):
     user_service.validate_update(asset)
-    stored_asset = crud.get_asset(asset_id, db)
-    if not stored_asset:
-        raise HTTPException(
-            status_code=404, detail="The asset with this id does not exist"
-        )
-    user_service.validate_parent_asset(asset.parent_asset_id, crud, db)
+    stored_asset = user_service.validate_parent_asset_for_update(asset, asset_id, crud, db)
     return crud.update_asset(db, stored_asset, asset)
 
 
@@ -75,14 +70,8 @@ def partial_update_asset(
     db: Session = Depends(get_db),
     user_service: UserService = Depends(UserService),
 ):
-    stored_asset = crud.get_asset(asset_id, db)
-    if not stored_asset:
-        raise HTTPException(
-            status_code=404, detail="The asset with this id does not exist"
-        )
-
-    user_service.validate_parent_asset(asset.parent_asset_id, crud, db)
-    return crud.update_asset(db, stored_asset, asset)
+    stored_asset = user_service.validate_parent_asset_for_update(asset, asset_id, crud, db)
+    return crud.update_asset(db, stored_asset, asset, partial=True)
 
 
 @app.delete("/assets/{asset_id}", response_model=schemas.Asset)
