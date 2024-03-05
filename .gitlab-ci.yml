@@ -1,0 +1,13 @@
+stages:          
+  - test
+
+test-job:
+  image: python:3.11   
+  stage: test
+  script:
+    - pip install poetry
+    - poetry export --with test -f requirements.txt --output requirements.txt --without-hashes
+    - pip install -r requirements.txt
+    - mv $ENV_FILE ./$ENV
+    - pytest --disable-warnings
+
