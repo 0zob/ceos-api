@@ -1,0 +1,51 @@
+version: '3'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:16.2
+    ports:
+      - "5432:5432"
+    networks:
+      - local_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_PASSWORD: root
+
+  ceos-api:
+    container_name: ceos-api
+    build: .
+    image: ceos-api
+    command: uvicorn ceos.main:app --host 0.0.0.0 --port 80 --reload
+    environment:
+      - ENV=.env
+    ports:
+      - 8000:80
+    networks:
+      - local_network
+    volumes:
+      - .:/code
+    depends_on:
+      - postgres
+      - migrations
+  
+  migrations:
+    container_name: migrations
+    build: .
+    image: ceos-api
+    command: alembic upgrade head
+    environment:
+      - ENV=.env
+    networks:
+      - local_network
+    volumes:
+      - .:/code
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  local_network:
