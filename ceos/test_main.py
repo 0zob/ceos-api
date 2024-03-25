@@ -4,8 +4,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from ceos.services import FileService
-
 from . import crud, schemas
 from .database import Base
 from .main import app, get_db
@@ -31,13 +29,7 @@ def override_get_db():
         db.close()
 
 
-class MockFileService:
-    def check_if_file_exists(self, file_path: str | None):
-        return True
-
-
 app.dependency_overrides[get_db] = override_get_db
-app.dependency_overrides[FileService] = MockFileService
 
 client = TestClient(app)
 import contextlib
@@ -209,12 +201,3 @@ def test_patch_return_400_if_parent_asset_doesnt_exists():
     data = response.json()
 
     assert data["detail"] == "parent_asset_id target is not a folder or not exist"
-
-
-def test_post_folder_dont_have_file_path():
-    response = client.post(
-        "/assets", json={"name": "string", "folder": True, "file_path": "string"}
-    )
-    assert response.status_code == 400
-    data = response.json()
-    assert data["detail"] == "folder cant have file_path"

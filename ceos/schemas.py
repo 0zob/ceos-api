@@ -10,7 +10,6 @@ class AssetBase(BaseModel):
     name: str
     parent_asset_id: int | None = None
     folder: bool = False
-    file_path: str | None = None
 
     @field_validator("parent_asset_id")
     @classmethod

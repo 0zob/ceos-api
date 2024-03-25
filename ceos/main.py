@@ -46,7 +46,6 @@ def create_asset(
     db: Session = Depends(get_db),
     user_service: UserService = Depends(UserService),
 ):
-    user_service.validate_create(asset)
     user_service.validate_parent_asset(asset, crud, db)
     return crud.create_asset(db, asset)
 
@@ -58,7 +57,6 @@ def update_asset(
     db: Session = Depends(get_db),
     user_service: UserService = Depends(UserService),
 ):
-    user_service.validate_update(asset)
     stored_asset = user_service.validate_parent_asset_for_update(asset, asset_id, crud, db)
     return crud.update_asset(db, stored_asset, asset)
 
