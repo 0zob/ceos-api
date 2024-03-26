@@ -21,7 +21,7 @@ services:
     image: ceos-api
     command: uvicorn ceos.main:app --host 0.0.0.0 --port 80 --reload
     environment:
-      - ENV=.env
+      - ENV=.env-docker
     ports:
       - 8000:80
     networks:
@@ -38,7 +38,7 @@ services:
     image: ceos-api
     command: alembic upgrade head
     environment:
-      - ENV=.env
+      - ENV=.env-docker
     networks:
       - local_network
     volumes:
