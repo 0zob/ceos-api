@@ -4,9 +4,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from . import crud, schemas
+from . import schemas
 from .database import Base
 from .main import app, get_db
+from .services import AssetService
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -37,10 +38,13 @@ import contextlib
 meta = Base.metadata
 
 
+asset_service = AssetService()
+
+
 def create_asset(**obj):
     with TestingSessionLocal() as db:
         asset = schemas.AssetCreate(**obj)
-        asset_created = crud.create_asset(db, asset)
+        asset_created = asset_service.create_asset(db, asset)
 
     return asset_created
 
