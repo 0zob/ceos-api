@@ -205,3 +205,10 @@ def test_patch_return_400_if_parent_asset_doesnt_exists():
     data = response.json()
 
     assert data["detail"] == "parent_asset_id target is not a folder or not exist"
+def test_delete_return_200_if_asset_deleted():
+    asset_for_delete = create_asset(name="for delete", folder=True)
+
+    response = client.delete(f"/assets/{asset_for_delete.id}/")
+
+    assert response.status_code == 200
+

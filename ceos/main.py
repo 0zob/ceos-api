@@ -77,7 +77,11 @@ def partial_update_asset(
 
 
 @app.delete("/assets/{asset_id}", response_model=schemas.Asset)
-def delete_asset(asset_id: int, db: Session = Depends(get_db)):
+def delete_asset(
+    asset_id: int,
+    db: Session = Depends(get_db),
+    asset_service: AssetService = Depends(AssetService),
+):
     asset = asset_service.get_asset(asset_id, db)
     if not asset:
         raise HTTPException(status_code=404, detail="Asset not found")
